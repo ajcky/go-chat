@@ -1,0 +1,10 @@
+{
+    "require": {
+        "overtrue/wechat": "~5.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "easywechat-composer/easywechat-composer": true
+        }
+    }
+}
