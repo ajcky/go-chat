@@ -11,7 +11,7 @@ $tmpStr = implode($tmpArr);
 $tmpStr = sha1($tmpStr);
 
 if ($tmpStr == $signature) {
-    echo $echostr;
+    echo "success";
     exit;
 } else {
     echo "验证失败";
