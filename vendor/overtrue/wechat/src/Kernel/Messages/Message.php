@@ -74,8 +74,6 @@ abstract class Message implements MessageInterface
 
     /**
      * Message constructor.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -84,17 +82,12 @@ abstract class Message implements MessageInterface
 
     /**
      * Return type name message.
-     *
-     * @return string
      */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     */
     public function setType(string $type)
     {
         $this->type = $type;
@@ -136,8 +129,6 @@ abstract class Message implements MessageInterface
     }
 
     /**
-     * @param array $appends
-     *
      * @return array
      */
     public function transformForJsonRequestWithoutType(array $appends = [])
@@ -146,10 +137,7 @@ abstract class Message implements MessageInterface
     }
 
     /**
-     * @param array $appends
-     * @param bool  $withType
-     *
-     * @return array
+     * @param bool $withType
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      */
@@ -166,12 +154,6 @@ abstract class Message implements MessageInterface
         return $data;
     }
 
-    /**
-     * @param array $appends
-     * @param bool  $returnAsArray
-     *
-     * @return string
-     */
     public function transformToXml(array $appends = [], bool $returnAsArray = false): string
     {
         $data = array_merge(['MsgType' => $this->getType()], $this->toXmlArray(), $appends);
@@ -180,11 +162,6 @@ abstract class Message implements MessageInterface
     }
 
     /**
-     * @param array $data
-     * @param array $aliases
-     *
-     * @return array
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      */
     protected function propertiesToArray(array $data, array $aliases = []): array

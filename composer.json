@@ -1,6 +1,6 @@
 {
     "require": {
-        "overtrue/wechat": "~5.0"
+        "overtrue/wechat": "~4.0"
     },
     "config": {
         "allow-plugins": {

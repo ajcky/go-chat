@@ -92,9 +92,6 @@ class Client extends BaseClient
     /**
      * Upload temporary material.
      *
-     * @param string $type
-     * @param string $path
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
@@ -115,10 +112,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $path
-     * @param string $title
-     * @param string $description
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
@@ -139,10 +132,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $mediaId
-     * @param string $title
-     * @param string $description
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -159,8 +148,6 @@ class Client extends BaseClient
 
     /**
      * Fetch item from WeChat server.
-     *
-     * @param string $mediaId
      *
      * @return \EasyWeChat\Kernel\Http\StreamResponse|\Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
@@ -183,8 +170,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param string $mediaId
-     *
      * @return array|\EasyWeChat\Kernel\Http\Response|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException

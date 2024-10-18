@@ -24,24 +24,22 @@ class Client extends BaseClient
     /**
      * Text content security check.
      *
-     * @param string $text
-     * @param array $extra
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function checkText(string $text, array $extra = [])
+    public function checkText(string $text)
     {
-        $params = array_merge(['content' => $text], $extra);
+        $params = [
+            'content' => $text,
+        ];
 
         return $this->httpPostJson('wxa/msg_sec_check', $params);
     }
 
     /**
      * Image security check.
-     *
-     * @param string $path
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
@@ -55,9 +53,6 @@ class Client extends BaseClient
 
     /**
      * Media security check.
-     *
-     * @param string $mediaUrl
-     * @param int    $mediaType
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
@@ -87,8 +82,6 @@ class Client extends BaseClient
     /**
      * Image security check async.
      *
-     * @param string $mediaUrl
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -101,8 +94,6 @@ class Client extends BaseClient
 
     /**
      * Audio security check async.
-     *
-     * @param string $mediaUrl
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *

@@ -29,8 +29,6 @@ class EchoStrHandler implements EventHandlerInterface
 
     /**
      * EchoStrHandler constructor.
-     *
-     * @param ServiceContainer $app
      */
     public function __construct(ServiceContainer $app)
     {
@@ -47,7 +45,5 @@ class EchoStrHandler implements EventHandlerInterface
         if ($str = $this->app['request']->get('echostr')) {
             return new FinallyResult($str);
         }
-
-        return null;
     }
 }

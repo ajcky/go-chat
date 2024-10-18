@@ -19,20 +19,16 @@ use EasyWeChat\OpenPlatform\Authorizer\Aggregate\AggregateServiceProvider;
  *
  * @author mingyoung <mingyoungcheung@gmail.com>
  *
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Account\Client  $account
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Code\Client     $code
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Domain\Client   $domain
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Setting\Client  $setting
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Tester\Client   $tester
- * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Material\Client $material
+ * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Account\Client $account
+ * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Code\Client    $code
+ * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Domain\Client  $domain
+ * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Setting\Client $setting
+ * @property \EasyWeChat\OpenPlatform\Authorizer\MiniProgram\Tester\Client  $tester
  */
 class Application extends MiniProgram
 {
     /**
      * Application constructor.
-     *
-     * @param array $config
-     * @param array $prepends
      */
     public function __construct(array $config = [], array $prepends = [])
     {
@@ -45,9 +41,6 @@ class Application extends MiniProgram
             Account\ServiceProvider::class,
             Setting\ServiceProvider::class,
             Tester\ServiceProvider::class,
-            Material\ServiceProvider::class,
-            Privacy\ServiceProvider::class,
-            Security\ServiceProvider::class,
         ];
 
         foreach ($providers as $provider) {

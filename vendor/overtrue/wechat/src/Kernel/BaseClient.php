@@ -27,18 +27,18 @@ use Psr\Log\LogLevel;
  */
 class BaseClient
 {
-    use HasHttpRequests {
-        request as performRequest;
-    }
+    use HasHttpRequests { request as performRequest; }
 
     /**
      * @var \EasyWeChat\Kernel\ServiceContainer
      */
     protected $app;
+
     /**
-     * @var \EasyWeChat\Kernel\Contracts\AccessTokenInterface|null
+     * @var \EasyWeChat\Kernel\Contracts\AccessTokenInterface
      */
-    protected $accessToken = null;
+    protected $accessToken;
+
     /**
      * @var string
      */
@@ -47,8 +47,7 @@ class BaseClient
     /**
      * BaseClient constructor.
      *
-     * @param \EasyWeChat\Kernel\ServiceContainer                    $app
-     * @param \EasyWeChat\Kernel\Contracts\AccessTokenInterface|null $accessToken
+     * @param \EasyWeChat\Kernel\ServiceContainer $app
      */
     public function __construct(ServiceContainer $app, AccessTokenInterface $accessToken = null)
     {
@@ -58,9 +57,6 @@ class BaseClient
 
     /**
      * GET request.
-     *
-     * @param string $url
-     * @param array  $query
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
@@ -75,9 +71,6 @@ class BaseClient
     /**
      * POST request.
      *
-     * @param string $url
-     * @param array  $data
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -90,10 +83,6 @@ class BaseClient
 
     /**
      * JSON request.
-     *
-     * @param string $url
-     * @param array  $data
-     * @param array  $query
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
@@ -108,11 +97,6 @@ class BaseClient
     /**
      * Upload file.
      *
-     * @param string $url
-     * @param array  $files
-     * @param array  $form
-     * @param array  $query
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -121,19 +105,11 @@ class BaseClient
     public function httpUpload(string $url, array $files = [], array $form = [], array $query = [])
     {
         $multipart = [];
-        $headers = [];
-
-        if (isset($form['filename'])) {
-            $headers = [
-                'Content-Disposition' => 'form-data; name="media"; filename="'.$form['filename'].'"'
-            ];
-        }
 
         foreach ($files as $name => $path) {
             $multipart[] = [
                 'name' => $name,
                 'contents' => fopen($path, 'r'),
-                'headers' => $headers
             ];
         }
 
@@ -141,24 +117,15 @@ class BaseClient
             $multipart[] = compact('name', 'contents');
         }
 
-        return $this->request(
-            $url,
-            'POST',
-            ['query' => $query, 'multipart' => $multipart, 'connect_timeout' => 30, 'timeout' => 30, 'read_timeout' => 30]
-        );
+        return $this->request($url, 'POST', ['query' => $query, 'multipart' => $multipart, 'connect_timeout' => 30, 'timeout' => 30, 'read_timeout' => 30]);
     }
 
-    /**
-     * @return AccessTokenInterface
-     */
     public function getAccessToken(): AccessTokenInterface
     {
         return $this->accessToken;
     }
 
     /**
-     * @param \EasyWeChat\Kernel\Contracts\AccessTokenInterface $accessToken
-     *
      * @return $this
      */
     public function setAccessToken(AccessTokenInterface $accessToken)
@@ -169,10 +136,7 @@ class BaseClient
     }
 
     /**
-     * @param string $url
-     * @param string $method
-     * @param array  $options
-     * @param bool   $returnRaw
+     * @param bool $returnRaw
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
@@ -193,10 +157,6 @@ class BaseClient
     }
 
     /**
-     * @param string $url
-     * @param string $method
-     * @param array  $options
-     *
      * @return \EasyWeChat\Kernel\Http\Response
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -257,30 +217,27 @@ class BaseClient
      */
     protected function retryMiddleware()
     {
-        return Middleware::retry(
-            function (
-                $retries,
-                RequestInterface $request,
-                ResponseInterface $response = null
-            ) {
-                // Limit the number of retries to 2
-                if ($retries < $this->app->config->get('http.max_retries', 1) && $response && $body = $response->getBody()) {
-                    // Retry on server errors
-                    $response = json_decode($body, true);
+        return Middleware::retry(function (
+            $retries,
+            RequestInterface $request,
+            ResponseInterface $response = null
+        ) {
+            // Limit the number of retries to 2
+            if ($retries < $this->app->config->get('http.max_retries', 1) && $response && $body = $response->getBody()) {
+                // Retry on server errors
+                $response = json_decode($body, true);
 
-                    if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 40014, 42001], true)) {
-                        $this->accessToken->refresh();
-                        $this->app['logger']->debug('Retrying with refreshed access token.');
+                if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 40014, 42001], true)) {
+                    $this->accessToken->refresh();
+                    $this->app['logger']->debug('Retrying with refreshed access token.');
 
-                        return true;
-                    }
+                    return true;
                 }
-
-                return false;
-            },
-            function () {
-                return abs($this->app->config->get('http.retry_delay', 500));
             }
-        );
+
+            return false;
+        }, function () {
+            return abs($this->app->config->get('http.retry_delay', 500));
+        });
     }
 }

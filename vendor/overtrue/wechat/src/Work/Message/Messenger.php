@@ -15,7 +15,6 @@ use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
 use EasyWeChat\Kernel\Exceptions\RuntimeException;
 use EasyWeChat\Kernel\Messages\Message;
 use EasyWeChat\Kernel\Messages\Text;
-use EasyWeChat\Kernel\Support\Arr;
 
 /**
  * Class MessageBuilder.
@@ -84,8 +83,6 @@ class Messenger
     }
 
     /**
-     * @param int $agentId
-     *
      * @return \EasyWeChat\Work\Message\Messenger
      */
     public function ofAgent(int $agentId)
@@ -138,18 +135,7 @@ class Messenger
     }
 
     /**
-     * verify recipient is '@all' or not
-     *
-     * @return bool
-     */
-    protected function isBroadcast(): bool
-    {
-        return Arr::get($this->to, 'touser') === '@all';
-    }
-
-    /**
      * @param array|string $ids
-     * @param string       $key
      *
      * @return \EasyWeChat\Work\Message\Messenger
      */
@@ -159,7 +145,7 @@ class Messenger
             $ids = implode('|', $ids);
         }
 
-        $this->to = $this->isBroadcast() ? [$key => $ids] : array_merge($this->to, [$key => $ids]);
+        $this->to = [$key => $ids];
 
         return $this;
     }
@@ -194,6 +180,21 @@ class Messenger
         $this->secretive = false;
 
         return $this->client->send($message);
+    }
+    
+    /**
+     * @param string $msgid
+     *
+     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     *
+     * @throws RuntimeException
+     */
+    public function recall(string $msgid)
+    {
+        if (empty($msgid)) {
+            throw new RuntimeException('No msgid specified.');
+        }
+        return $this->client->recall($msgid);
     }
 
     /**

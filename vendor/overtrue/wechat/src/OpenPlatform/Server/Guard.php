@@ -33,8 +33,6 @@ class Guard extends ServerGuard
     public const EVENT_THIRD_FAST_REGISTERED = 'notify_third_fasteregister';
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\BadRequestException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException

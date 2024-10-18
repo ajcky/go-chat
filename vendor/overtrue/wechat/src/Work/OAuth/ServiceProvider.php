@@ -11,6 +11,7 @@
 
 namespace EasyWeChat\Work\OAuth;
 
+use Overtrue\Socialite\SocialiteManager;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -19,16 +20,13 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         $app['oauth'] = function ($app) {
-            $socialite = (new Manager([
+            $socialite = (new SocialiteManager([
                 'wework' => [
-                    'base_url' => $app['config']['http']['base_uri'],
                     'client_id' => $app['config']['corp_id'],
                     'client_secret' => null,
-                    'corp_id' => $app['config']['corp_id'],
-                    'corp_secret' => $app['config']['secret'],
                     'redirect' => $this->prepareCallbackUrl($app),
                 ],
-            ], $app));
+            ], $app['request']))->driver('wework');
 
             $scopes = (array) $app['config']->get('oauth.scopes', ['snsapi_base']);
 
@@ -38,7 +36,7 @@ class ServiceProvider implements ServiceProviderInterface
                 $socialite->setAgentId($app['config']['agent_id']);
             }
 
-            return $socialite;
+            return $socialite->setAccessToken(new AccessTokenDelegate($app));
         };
     }
 
@@ -51,7 +49,7 @@ class ServiceProvider implements ServiceProviderInterface
      */
     private function prepareCallbackUrl($app)
     {
-        $callback = (string) $app['config']->get('oauth.callback', '');
+        $callback = $app['config']->get('oauth.callback');
 
         if (0 === stripos($callback, 'http')) {
             return $callback;

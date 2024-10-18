@@ -46,8 +46,6 @@ class Client extends BaseClient
     /**
      * Send miniprogram normal redpack.
      *
-     * @param array $params
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -58,7 +56,6 @@ class Client extends BaseClient
             'total_num' => 1,
             'client_ip' => $params['client_ip'] ?? Support\get_server_ip(),
             'wxappid' => $this->app['config']->app_id,
-            'notify_way' => 'MINI_PROGRAM_JSAPI',
         ];
 
         return $this->safeRequest('mmpaymkttransfers/sendminiprogramhb', array_merge($base, $params));
@@ -66,8 +63,6 @@ class Client extends BaseClient
 
     /**
      * Send normal redpack.
-     *
-     * @param array $params
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
@@ -88,8 +83,6 @@ class Client extends BaseClient
 
     /**
      * Send group redpack.
-     *
-     * @param array $params
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *

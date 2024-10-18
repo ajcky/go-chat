@@ -56,7 +56,6 @@ class Clause
     {
         foreach ($this->clauses['where'] as $item) {
             list($key, $value) = $item;
-
             if (!isset($payload[$key])) {
                 continue;
             }
@@ -69,7 +68,6 @@ class Clause
                 return true;
             }
         }
-
         return false;
     }
 }

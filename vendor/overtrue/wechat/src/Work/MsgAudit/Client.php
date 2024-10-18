@@ -25,7 +25,7 @@ class Client extends BaseClient
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException|\GuzzleHttp\Exception\GuzzleException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
     public function getPermitUsers(string $type = null)
     {
@@ -38,7 +38,6 @@ class Client extends BaseClient
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getSingleAgreeStatus(array $info)
     {
@@ -50,12 +49,11 @@ class Client extends BaseClient
     }
 
     /**
-     * @param  string  $roomId
+     * @param string $roomid
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getRoomAgreeStatus(string $roomId)
     {
@@ -67,12 +65,11 @@ class Client extends BaseClient
     }
 
     /**
-     * @param  string  $roomId
+     * @param string $roomid
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getRoom(string $roomId)
     {

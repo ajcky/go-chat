@@ -23,8 +23,6 @@ class Client extends BaseClient
     /**
      * 绑定小程序体验者.
      *
-     * @param string $wechatId
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -40,31 +38,20 @@ class Client extends BaseClient
     /**
      * 解绑小程序体验者.
      *
-     * @param string $wechatId
-     * @param string $userStr
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function unbind(string $wechatId = null, string $userStr = null)
+    public function unbind(string $wechatId)
     {
         return $this->httpPostJson('wxa/unbind_tester', [
-                ($userStr ? 'userstr' : 'wechatid') => $userStr ?? $wechatId,
-            ]);
-    }
-
-    public function unbindWithUserStr(string $userStr)
-    {
-        return $this->httpPostJson('wxa/unbind_tester', [
-                'userstr' => $userStr,
-            ]);
+            'wechatid' => $wechatId,
+        ]);
     }
 
     /**
      * 获取体验者列表.
-     *
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *

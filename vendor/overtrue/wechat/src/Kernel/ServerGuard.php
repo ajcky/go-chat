@@ -89,8 +89,6 @@ class ServerGuard
     /**
      * Handle and return response.
      *
-     * @return Response
-     *
      * @throws BadRequestException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -181,8 +179,6 @@ class ServerGuard
     /**
      * Resolve server request and return the response.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\BadRequestException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -215,8 +211,6 @@ class ServerGuard
     }
 
     /**
-     * @param string                                                   $to
-     * @param string                                                   $from
      * @param \EasyWeChat\Kernel\Contracts\MessageInterface|string|int $message
      *
      * @return string
@@ -251,8 +245,6 @@ class ServerGuard
     /**
      * Handle request.
      *
-     * @return array
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\BadRequestException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -274,12 +266,6 @@ class ServerGuard
 
     /**
      * Build reply XML.
-     *
-     * @param string                                        $to
-     * @param string                                        $from
-     * @param \EasyWeChat\Kernel\Contracts\MessageInterface $message
-     *
-     * @return string
      */
     protected function buildReply(string $to, string $from, MessageInterface $message): string
     {
@@ -301,8 +287,6 @@ class ServerGuard
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     protected function signature(array $params)
@@ -342,25 +326,18 @@ class ServerGuard
 
     /**
      * Check the request message safe mode.
-     *
-     * @return bool
      */
     protected function isSafeMode(): bool
     {
         return $this->app['request']->get('signature') && 'aes' === $this->app['request']->get('encrypt_type');
     }
 
-    /**
-     * @return bool
-     */
     protected function shouldReturnRawResponse(): bool
     {
         return false;
     }
 
     /**
-     * @param array $message
-     *
      * @return mixed
      */
     protected function decryptMessage(array $message)

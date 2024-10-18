@@ -88,13 +88,9 @@ class Client extends BaseClient
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function addTemplate($shortId, $keywordList = [])
+    public function addTemplate($shortId)
     {
         $params = ['template_id_short' => $shortId];
-
-        if ($keywordList) {
-            $params['keyword_name_list'] = $keywordList;
-        }
 
         return $this->httpPostJson('cgi-bin/template/api_add_template', $params);
     }
@@ -132,8 +128,6 @@ class Client extends BaseClient
     /**
      * Send a template message.
      *
-     * @param array $data
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
@@ -152,8 +146,6 @@ class Client extends BaseClient
     /**
      * Send template-message for subscription.
      *
-     * @param array $data
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
@@ -170,8 +162,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
@@ -194,8 +184,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      */
     protected function formatData(array $data)

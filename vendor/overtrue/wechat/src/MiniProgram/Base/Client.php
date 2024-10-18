@@ -37,15 +37,17 @@ class Client extends BaseClient
     }
 
     /**
-     * Get version info
+     * Get user phone number by code
+     *
+     * @param string $code
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getVersionInfo()
+    public function getPhoneNumber($code)
     {
-        return $this->httpPostJson('wxa/getversioninfo');
+        return $this->httpPostJson('wxa/business/getuserphonenumber', ['code' => $code]);
     }
 }

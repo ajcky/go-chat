@@ -23,9 +23,6 @@ class Client extends BaseClient
     /**
      * Get summary trend.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function summaryTrend(string $from, string $to)
@@ -35,9 +32,6 @@ class Client extends BaseClient
 
     /**
      * Get daily visit trend.
-     *
-     * @param string $from
-     * @param string $to
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
@@ -49,9 +43,6 @@ class Client extends BaseClient
     /**
      * Get weekly visit trend.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function weeklyVisitTrend(string $from, string $to)
@@ -61,9 +52,6 @@ class Client extends BaseClient
 
     /**
      * Get monthly visit trend.
-     *
-     * @param string $from
-     * @param string $to
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
@@ -75,9 +63,6 @@ class Client extends BaseClient
     /**
      * Get visit distribution.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function visitDistribution(string $from, string $to)
@@ -87,9 +72,6 @@ class Client extends BaseClient
 
     /**
      * Get daily retain info.
-     *
-     * @param string $from
-     * @param string $to
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
@@ -101,9 +83,6 @@ class Client extends BaseClient
     /**
      * Get weekly retain info.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function weeklyRetainInfo(string $from, string $to)
@@ -113,9 +92,6 @@ class Client extends BaseClient
 
     /**
      * Get monthly retain info.
-     *
-     * @param string $from
-     * @param string $to
      *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
@@ -127,9 +103,6 @@ class Client extends BaseClient
     /**
      * Get visit page.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function visitPage(string $from, string $to)
@@ -140,9 +113,6 @@ class Client extends BaseClient
     /**
      * Get user portrait.
      *
-     * @param string $from
-     * @param string $to
-     *
      * @return \Psr\Http\Message\ResponseInterface|\EasyWeChat\Kernel\Support\Collection|array|object|string
      */
     public function userPortrait(string $from, string $to)
@@ -151,40 +121,7 @@ class Client extends BaseClient
     }
 
     /**
-     * get performance data
-     * @param string $from
-     * @param string $to
-     * @param string $module
-     * @param string $networktype
-     * @param string $device_level
-     * @param string $device
-     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function devicePerformanceData(string $from, string $to, string $module, string $networktype = '-1', string $device_level = '-1', string $device = '-1')
-    {
-        $payload = [
-            'time' => [
-                'end_timestamp' => strtotime($to),
-                'begin_timestamp' => strtotime($from),
-            ],
-            'module' => $module,
-            'params' => [
-                ['field' => 'networktype',  'value' => $networktype],
-                ['field' => 'device_level', 'value' => $device_level],
-                ['field' => 'device',       'value' => $device],
-            ]
-        ];
-        return $this->httpPostJson('wxa/business/performance/boot', $payload);
-    }
-
-    /**
      * Unify query.
-     *
-     * @param string $api
-     * @param string $from
-     * @param string $to
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *

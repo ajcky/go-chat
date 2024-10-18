@@ -12,9 +12,7 @@
 namespace EasyWeChat\Work\Jssdk;
 
 use EasyWeChat\BasicService\Jssdk\Client as BaseClient;
-use EasyWeChat\Kernel\Contracts\AccessTokenInterface;
 use EasyWeChat\Kernel\Exceptions\RuntimeException;
-use EasyWeChat\Kernel\ServiceContainer;
 use EasyWeChat\Kernel\Support;
 
 /**
@@ -24,12 +22,7 @@ use EasyWeChat\Kernel\Support;
  */
 class Client extends BaseClient
 {
-    public function __construct(ServiceContainer $app, AccessTokenInterface $accessToken = null)
-    {
-        parent::__construct($app, $accessToken);
-
-        $this->ticketEndpoint = \rtrim($app->config->get('http.base_uri'), '/').'/cgi-bin/get_jsapi_ticket';
-    }
+    protected $ticketEndpoint = 'cgi-bin/get_jsapi_ticket';
 
     /**
      * @return string
@@ -40,14 +33,20 @@ class Client extends BaseClient
     }
 
     /**
-     * Return jsapi agent config as a PHP array.
-     *
-     * @param  array  $apis
-     * @param  int|string  $agentId
-     * @param  bool  $debug
-     * @param  bool  $beta
-     * @param  array  $openTagList
-     * @param  string|null  $url
+     * @return string
+     */
+    protected function getAgentId()
+    {
+        return $this->app['config']->get('agent_id');
+    }
+
+    /**
+     * @param array       $apis
+     * @param             $agentId
+     * @param bool        $debug
+     * @param bool        $beta
+     * @param array       $openTagList
+     * @param string|null $url
      *
      * @return array|string
      *
@@ -57,27 +56,19 @@ class Client extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getAgentConfigArray(
-        array $apis,
-        $agentId,
-        bool $debug = false,
-        bool $beta = false,
-        array $openTagList = [],
-        string $url = null
-    ) {
+    public function getAgentConfigArray(array $apis, $agentId, bool $debug = false, bool $beta = false, array $openTagList = [], string $url = null)
+    {
         return $this->buildAgentConfig($apis, $agentId, $debug, $beta, false, $openTagList, $url);
     }
 
     /**
-     * Get agent config json for jsapi.
-     *
-     * @param  array  $jsApiList
-     * @param  int|string  $agentId
-     * @param  bool  $debug
-     * @param  bool  $beta
-     * @param  bool  $json
-     * @param  array  $openTagList
-     * @param  string|null  $url
+     * @param array       $jsApiList
+     * @param             $agentId
+     * @param bool        $debug
+     * @param bool        $beta
+     * @param bool        $json
+     * @param array       $openTagList
+     * @param string|null $url
      *
      * @return array|string
      *
@@ -87,25 +78,18 @@ class Client extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function buildAgentConfig(
-        array $jsApiList,
-        $agentId,
-        bool $debug = false,
-        bool $beta = false,
-        bool $json = true,
-        array $openTagList = [],
-        string $url = null
-    ) {
+    public function buildAgentConfig(array $jsApiList, $agentId, bool $debug = false, bool $beta = false, bool $json = true, array $openTagList = [], string $url = null)
+    {
         $config = array_merge(compact('debug', 'beta', 'jsApiList', 'openTagList'), $this->agentConfigSignature($agentId, $url));
 
         return $json ? json_encode($config) : $config;
     }
 
     /**
-     * @param  int|string  $agentId
-     * @param  string|null  $url
-     * @param  string|null  $nonce
-     * @param  null  $timestamp
+     * @param             $agentId
+     * @param string|null $url
+     * @param string|null $nonce
+     * @param null        $timestamp
      *
      * @return array
      *
@@ -127,15 +111,15 @@ class Client extends BaseClient
             'nonceStr' => $nonce,
             'timestamp' => $timestamp,
             'url' => $url,
-            'signature' => $this->getTicketSignature($this->getAgentTicket($agentId)['ticket'], $nonce, $timestamp, $url),
+            'signature' => $this->getTicketSignature($this->getAgentTicket()['ticket'], $nonce, $timestamp, $url),
         ];
     }
 
     /**
      * Get js ticket.
      *
-     * @param  bool  $refresh
-     * @param  string  $type
+     * @param bool   $refresh
+     * @param string $type
      *
      * @return array
      *
@@ -169,21 +153,17 @@ class Client extends BaseClient
     }
 
     /**
-     * @param  int  $agentId
-     * @param  bool  $refresh
-     * @param  string  $type
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|mixed|object|\Psr\Http\Message\ResponseInterface|string
      *
+     * @throws RuntimeException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getAgentTicket($agentId, bool $refresh = false, string $type = 'agent_config')
+    public function getAgentTicket(bool $refresh = false, string $type = 'agent_config')
     {
-        $cacheKey = sprintf('easywechat.work.jssdk.ticket.%s.%s.%s', $agentId, $type, $this->getAppId());
+        $cacheKey = sprintf('easywechat.work.jssdk.ticket.%s.%s.%s', $type, $this->getAppId(), $this->getAgentId());
 
         if (!$refresh && $this->getCache()->has($cacheKey)) {
             return $this->getCache()->get($cacheKey);

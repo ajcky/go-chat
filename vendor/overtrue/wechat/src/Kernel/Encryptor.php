@@ -65,10 +65,6 @@ class Encryptor
 
     /**
      * Constructor.
-     *
-     * @param string      $appId
-     * @param string|null $token
-     * @param string|null $aesKey
      */
     public function __construct(string $appId, string $token = null, string $aesKey = null)
     {
@@ -79,8 +75,6 @@ class Encryptor
 
     /**
      * Get the app token.
-     *
-     * @return string
      */
     public function getToken(): string
     {
@@ -94,8 +88,6 @@ class Encryptor
      * @param string $nonce
      * @param int    $timestamp
      *
-     * @return string
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
     public function encrypt($xml, $nonce = null, $timestamp = null): string
@@ -107,7 +99,7 @@ class Encryptor
                 $xml,
                 $this->aesKey,
                 substr($this->aesKey, 0, 16),
-                OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+                OPENSSL_NO_PADDING
             ));
             // @codeCoverageIgnoreStart
         } catch (Throwable $e) {
@@ -137,8 +129,6 @@ class Encryptor
      * @param string $nonce
      * @param string $timestamp
      *
-     * @return string
-     *
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
     public function decrypt($content, $msgSignature, $nonce, $timestamp): string
@@ -153,7 +143,7 @@ class Encryptor
             base64_decode($content, true),
             $this->aesKey,
             substr($this->aesKey, 0, 16),
-            OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING
+            OPENSSL_NO_PADDING
         );
         $result = $this->pkcs7Unpad($decrypted);
         $content = substr($result, 16, strlen($result));
@@ -168,8 +158,6 @@ class Encryptor
 
     /**
      * Get SHA1.
-     *
-     * @return string
      */
     public function signature(): string
     {
@@ -181,11 +169,6 @@ class Encryptor
 
     /**
      * PKCS#7 pad.
-     *
-     * @param string $text
-     * @param int    $blockSize
-     *
-     * @return string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
@@ -202,10 +185,6 @@ class Encryptor
 
     /**
      * PKCS#7 unpad.
-     *
-     * @param string $text
-     *
-     * @return string
      */
     public function pkcs7Unpad(string $text): string
     {

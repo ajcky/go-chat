@@ -33,7 +33,7 @@ class LogServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         !isset($pimple['log']) && $pimple['log'] = function ($app) {
-            $config = $app['config']->get('log');
+            $config = $this->formatLogConfig($app);
 
             if (!empty($config)) {
                 $app->rebind('config', $app['config']->merge($config));
@@ -43,5 +43,40 @@ class LogServiceProvider implements ServiceProviderInterface
         };
 
         !isset($pimple['logger']) && $pimple['logger'] = $pimple['log'];
+    }
+
+    public function formatLogConfig($app)
+    {
+        if (!empty($app['config']->get('log.channels'))) {
+            return [
+                'log' => $app['config']->get('log'),
+            ];
+        }
+
+        if (empty($app['config']->get('log'))) {
+            return [
+                'log' => [
+                    'default' => 'null',
+                    'channels' => [
+                        'null' => [
+                            'driver' => 'null',
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        return [
+            'log' => [
+                'default' => 'single',
+                'channels' => [
+                    'single' => [
+                        'driver' => 'single',
+                        'path' => $app['config']->get('log.file') ?: \sys_get_temp_dir().'/logs/easywechat.log',
+                        'level' => $app['config']->get('log.level', 'debug'),
+                    ],
+                ],
+            ],
+        ];
     }
 }

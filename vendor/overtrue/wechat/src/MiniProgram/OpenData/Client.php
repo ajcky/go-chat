@@ -23,10 +23,6 @@ class Client extends BaseClient
     /**
      * removeUserStorage.
      *
-     * @param string $openid
-     * @param string $sessionKey
-     * @param array  $key
-     *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
@@ -46,10 +42,6 @@ class Client extends BaseClient
 
     /**
      * setUserStorage.
-     *
-     * @param string $openid
-     * @param string $sessionKey
-     * @param array  $kvList
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      *
@@ -71,8 +63,6 @@ class Client extends BaseClient
     }
 
     /**
-     * @param array $params
-     *
      * @return array
      */
     protected function formatKVLists(array $params)

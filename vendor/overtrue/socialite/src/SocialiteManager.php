@@ -1,46 +1,97 @@
 <?php
 
+/*
+ * This file is part of the overtrue/socialite.
+ *
+ * (c) overtrue <i@overtrue.me>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Overtrue\Socialite;
 
 use Closure;
 use InvalidArgumentException;
-use Overtrue\Socialite\Contracts\FactoryInterface;
-use Overtrue\Socialite\Contracts\ProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Class SocialiteManager.
+ */
 class SocialiteManager implements FactoryInterface
 {
-    protected Config $config;
-    protected array $resolved = [];
-    protected array $customCreators = [];
-    protected array $providers = [
-        Providers\QQ::NAME => Providers\QQ::class,
-        Providers\Tapd::NAME => Providers\Tapd::class,
-        Providers\Weibo::NAME => Providers\Weibo::class,
-        Providers\Alipay::NAME => Providers\Alipay::class,
-        Providers\QCloud::NAME => Providers\QCloud::class,
-        Providers\GitHub::NAME => Providers\GitHub::class,
-        Providers\Google::NAME => Providers\Google::class,
-        Providers\WeChat::NAME => Providers\WeChat::class,
-        Providers\Douban::NAME => Providers\Douban::class,
-        Providers\WeWork::NAME => Providers\WeWork::class,
-        Providers\DouYin::NAME => Providers\DouYin::class,
-        Providers\Taobao::NAME => Providers\Taobao::class,
-        Providers\FeiShu::NAME => Providers\FeiShu::class,
-        Providers\Outlook::NAME => Providers\Outlook::class,
-        Providers\Linkedin::NAME => Providers\Linkedin::class,
-        Providers\Facebook::NAME => Providers\Facebook::class,
-        Providers\DingTalk::NAME => Providers\DingTalk::class,
-        Providers\OpenWeWork::NAME => Providers\OpenWeWork::class,
-        Providers\Line::NAME => Providers\Line::class,
-        Providers\Gitee::NAME => Providers\Gitee::class,
+    /**
+     * The configuration.
+     *
+     * @var \Overtrue\Socialite\Config
+     */
+    protected $config;
+
+    /**
+     * The request instance.
+     *
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array
+     */
+    protected $customCreators = [];
+
+    /**
+     * The initial drivers.
+     *
+     * @var array
+     */
+    protected $initialDrivers = [
+        'facebook' => 'Facebook',
+        'github' => 'GitHub',
+        'google' => 'Google',
+        'linkedin' => 'Linkedin',
+        'weibo' => 'Weibo',
+        'qq' => 'QQ',
+        'wechat' => 'WeChat',
+        'douban' => 'Douban',
+        'wework' => 'WeWork',
+        'outlook' => 'Outlook',
+        'douyin' => 'DouYin',
+        'taobao' => 'Taobao',
+        'feishu' => 'FeiShu',
     ];
 
-    public function __construct(array $config)
+    /**
+     * The array of created "drivers".
+     *
+     * @var ProviderInterface[]
+     */
+    protected $drivers = [];
+
+    /**
+     * SocialiteManager constructor.
+     *
+     * @param array        $config
+     * @param Request|null $request
+     */
+    public function __construct(array $config, Request $request = null)
     {
         $this->config = new Config($config);
+
+        if ($this->config->has('guzzle')) {
+            Providers\AbstractProvider::setGuzzleOptions($this->config->get('guzzle'));
+        }
+
+        if ($request) {
+            $this->setRequest($request);
+        }
     }
 
     /**
+     * Set config instance.
+     *
      * @param \Overtrue\Socialite\Config $config
      *
      * @return $this
@@ -53,94 +104,148 @@ class SocialiteManager implements FactoryInterface
     }
 
     /**
-     * @param string $name
+     * Get a driver instance.
      *
-     * @return \Overtrue\Socialite\Contracts\ProviderInterface
+     * @param string $driver
+     *
+     * @return ProviderInterface
      */
-    public function create(string $name): ProviderInterface
+    public function driver($driver)
     {
-        $name = strtolower($name);
+        $driver = strtolower($driver);
 
-        if (!isset($this->resolved[$name])) {
-            $this->resolved[$name] = $this->createProvider($name);
+        if (!isset($this->drivers[$driver])) {
+            $this->drivers[$driver] = $this->createDriver($driver);
         }
 
-        return $this->resolved[$name];
+        return $this->drivers[$driver];
     }
 
     /**
-     * @param string   $name
-     * @param \Closure $callback
+     * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return $this
      */
-    public function extend(string $name, Closure $callback): self
+    public function setRequest(Request $request)
     {
-        $this->customCreators[strtolower($name)] = $callback;
+        $this->request = $request;
 
         return $this;
     }
 
     /**
-     * @return \Overtrue\Socialite\Contracts\ProviderInterface[]
+     * @return \Symfony\Component\HttpFoundation\Request
      */
-    public function getResolvedProviders(): array
+    public function getRequest()
     {
-        return $this->resolved;
+        return $this->request ?: $this->createDefaultRequest();
     }
 
     /**
-     * @param string $provider
-     * @param array  $config
+     * Create a new driver instance.
      *
-     * @return \Overtrue\Socialite\Contracts\ProviderInterface
-     */
-    public function buildProvider(string $provider, array $config): ProviderInterface
-    {
-        return new $provider($config);
-    }
-
-    /**
-     * @param string $name
+     * @param string $driver
      *
-     * @return ProviderInterface
      * @throws \InvalidArgumentException
      *
+     * @return ProviderInterface
      */
-    protected function createProvider(string $name)
+    protected function createDriver($driver)
     {
-        $config = $this->config->get($name, []);
-        $provider = $config['provider'] ?? $name;
-
-        if (isset($this->customCreators[$provider])) {
-            return $this->callCustomCreator($provider, $config);
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver);
         }
 
-        if (!$this->isValidProvider($provider)) {
-            throw new InvalidArgumentException("Provider [$provider] not supported.");
+        if (isset($this->initialDrivers[$driver])) {
+            $provider = $this->initialDrivers[$driver];
+            $provider = __NAMESPACE__.'\\Providers\\'.$provider.'Provider';
+
+            return $this->buildProvider($provider, $this->formatConfig($this->config->get($driver)));
         }
 
-        return $this->buildProvider($this->providers[$provider] ?? $provider, $config);
+        throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
     /**
+     * Call a custom driver creator.
+     *
      * @param string $driver
+     *
+     * @return ProviderInterface
+     */
+    protected function callCustomCreator($driver)
+    {
+        return $this->customCreators[$driver]($this->config);
+    }
+
+    /**
+     * Create default request instance.
+     *
+     * @return Request
+     */
+    protected function createDefaultRequest()
+    {
+        $request = Request::createFromGlobals();
+        $session = new Session();
+
+        $request->setSession($session);
+
+        return $request;
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @param string   $driver
+     * @param \Closure $callback
+     *
+     * @return $this
+     */
+    public function extend($driver, Closure $callback)
+    {
+        $driver = strtolower($driver);
+
+        $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get all of the created "drivers".
+     *
+     * @return ProviderInterface[]
+     */
+    public function getDrivers()
+    {
+        return $this->drivers;
+    }
+
+    /**
+     * Build an OAuth 2 provider instance.
+     *
+     * @param string $provider
      * @param array  $config
      *
      * @return ProviderInterface
      */
-    protected function callCustomCreator(string $driver, array $config): ProviderInterface
+    public function buildProvider($provider, $config)
     {
-        return $this->customCreators[$driver]($config);
+        return new $provider($this->getRequest(), $config);
     }
 
     /**
-     * @param string $provider
+     * Format the server configuration.
      *
-     * @return bool
+     * @param array $config
+     *
+     * @return array
      */
-    protected function isValidProvider(string $provider): bool
+    public function formatConfig(array $config)
     {
-        return isset($this->providers[$provider]) || is_subclass_of($provider, ProviderInterface::class);
+        return array_merge([
+            'identifier' => $config['client_id'],
+            'secret' => $config['client_secret'],
+            'callback_uri' => $config['redirect'],
+        ], $config);
     }
 }

@@ -23,7 +23,6 @@ use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
  * @property \EasyWeChat\OfficialAccount\ShakeAround\MaterialClient $material
  * @property \EasyWeChat\OfficialAccount\ShakeAround\RelationClient $relation
  * @property \EasyWeChat\OfficialAccount\ShakeAround\StatsClient    $stats
- * @property \EasyWeChat\OfficialAccount\ShakeAround\PageClient     $page
  */
 class ShakeAround extends Client
 {
